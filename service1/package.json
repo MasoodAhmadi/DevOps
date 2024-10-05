@@ -1,0 +1,22 @@
+{
+  "name": "service1",
+  "version": "1.0.0",
+  "main": "api.js",
+  "dependencies": {
+    "express": "^4.17.1",
+    "react": "^17.0.2",
+    "react-dom": "^18.3.1",
+    "react-scripts": "^4.0.3"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.7",
+    "@babel/preset-env": "^7.25.7",
+    "@babel/preset-react": "^7.25.7"
+  }
+}

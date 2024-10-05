@@ -1,0 +1,22 @@
+# docker-compose.yml
+version: '3'
+services:
+  service1:
+    build: ./service1
+    ports:
+      - "8199:8199" # Expose Service1 (React frontend + Express API) on port 8199
+    depends_on:
+      - service2 # Ensure Service1 waits for Service2 to be ready
+    networks:
+      - app-network # Internal network for both services
+
+  service2:
+    build: ./service2
+    expose:
+      - "8080" # Expose port internally (not accessible from outside)
+    networks:
+      - app-network # Internal network for both services
+
+networks:
+  app-network:
+    driver: bridge
