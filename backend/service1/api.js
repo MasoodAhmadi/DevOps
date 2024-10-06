@@ -31,9 +31,9 @@ app.get('/api/uptime', (req, res) => {
 });
 
 // All other requests (like '/') should return the React app's index.html
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
-});
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(__dirname, 'build', 'index.html'));
+// });
 
 app.listen(8199, () => {
   console.log('Service1 (React + API) running on port 8199');

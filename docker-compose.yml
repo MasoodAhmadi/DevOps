@@ -1,22 +1,38 @@
-# docker-compose.yml
-version: '3'
+version: '3.5'  # Use version 3.8 for better compatibility
+
 services:
-  service1:
-    build: ./service1
+  frontend:
+    build:
+      dockerfile: Dockerfile
+      context: ./frontend  # Directory for frontend Dockerfile and code
     ports:
-      - "8199:8199" # Expose Service1 (React frontend + Express API) on port 8199
-    depends_on:
-      - service2 # Ensure Service1 waits for Service2 to be ready
+      - "3000:3000"  # Map host port 3000 to container port 3000
+    environment:
+      - CLIENT_CONTAINER_PORT=3000
+      - SERVER_CONTAINER_PORT=8080
     networks:
-      - app-network # Internal network for both services
+      - app-network
+
+  service1:
+    build:
+      dockerfile: Dockerfile
+      context: ./backend/service1  # Directory for service1 Dockerfile and code
+    ports:
+      - "8199:8199"  # Map host port 8199 to container port 8199
+    depends_on:
+      - service2  # Ensure service2 is started before service1
+    networks:
+      - app-network
 
   service2:
-    build: ./service2
-    expose:
-      - "8080" # Expose port internally (not accessible from outside)
+    build:
+      dockerfile: Dockerfile
+      context: ./backend/service2  # Directory for service2 Dockerfile and code
+    ports:
+      - "8080:8080"  # Map host port 8080 to container port 8080
     networks:
-      - app-network # Internal network for both services
+      - app-network
 
 networks:
   app-network:
-    driver: bridge
+    driver: bridge  # Use the default bridge network

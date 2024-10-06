@@ -14,7 +14,7 @@ function App() {
         const processes = (await (await fetch('/api/processes')).json()).processes;
         const disk_space = (await (await fetch('/api/disk')).json()).disk_space;
         const uptime = (await (await fetch('/api/uptime')).json()).uptime;
-
+  
         setService1Data({
           ip_address,
           processes,
@@ -25,22 +25,23 @@ function App() {
         console.error('Error fetching Service1 info:', error);
       }
     };
-
+  
     fetchService1Info();
-
+  
     // Fetch system info for Service2
     const fetchService2Info = async () => {
       try {
-        const response = await fetch('http://service2:8080/system-info');
+        const response = await fetch('http://localhost:8080/api/system-info');
         const data = await response.json();
         setService2Data(data);
       } catch (error) {
         console.error('Error fetching Service2 info:', error);
       }
     };
-
+  
     fetchService2Info();
   }, []);
+  
 
   return (
     <div className="App">
