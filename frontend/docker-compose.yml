@@ -1,0 +1,24 @@
+version: '3.5'
+
+services:
+  service1:
+    build:
+      context: ./service1
+      dockerfile: Dockerfile
+    ports:
+      - "8199:3000"  # Map port 8199 on host to port 3000 in the container
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./service1:/app  # Optional: Mount the local directory for live reload
+
+  service2:
+    build:
+      context: ./service2
+      dockerfile: Dockerfile
+    ports:
+      - "8080:3001"  # Map port 3001 on host to port 3001 in the container
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./service2:/app  # Optional: Mount the local directory for live reload

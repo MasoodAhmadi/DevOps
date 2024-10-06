@@ -1,0 +1,36 @@
+{
+  "name": "service1",
+  "version": "1.0.0",
+  "main": "api.js",
+  "dependencies": {
+    "child_process": "^1.0.2",
+    "express": "^4.21.0",
+    "os": "^0.1.2",
+    "path": "^0.12.7",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.2",
+    "react-scripts": "^5.0.1"
+  },
+  "scripts": {
+    "start": "node api.js",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

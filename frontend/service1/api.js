@@ -1,4 +1,3 @@
-// service1/api.js
 const express = require('express');
 const path = require('path');
 const { execSync } = require('child_process');
@@ -30,11 +29,13 @@ app.get('/api/uptime', (req, res) => {
   res.json({ uptime });
 });
 
-// All other requests (like '/') should return the React app's index.html
-// app.get('*', (req, res) => {
-//   res.sendFile(path.join(__dirname, 'build', 'index.html'));
-// });
+// Serve the React app
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
 
-app.listen(8199, () => {
-  console.log('Service1 (React + API) running on port 8199');
+// Start the server
+const PORT = process.env.PORT || 8199;
+app.listen(PORT, () => {
+  console.log(`Service1 (React + API) running on port ${PORT}`);
 });
