@@ -1,25 +1,21 @@
 # service1/Dockerfile
+FROM node:16-alpine
 
-# Use an official Node.js image as the base image
-FROM node:14
-
-# Set the working directory inside the container
+# Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json into the container
+# Copy package.json and install dependencies
 COPY package*.json ./
-
-# Install dependencies
 RUN npm install
 
-# Copy the rest of the application code into the container
+# Copy the rest of the application code
 COPY . .
 
-# Build the React application
+# Build the React app
 RUN npm run build
 
-# Expose the port that the application will run on
+# Expose port 8199
 EXPOSE 8199
 
-# Start the Express server to serve both the React frontend and the API
-CMD ["npm", "start"]"]
+# Start the server
+CMD ["npm", "start"]
