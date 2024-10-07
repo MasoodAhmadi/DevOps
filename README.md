@@ -7,5 +7,6 @@
 - docker-compose up –-build 
   … wait for 10s
 - curl localhost:8199
-- cdocker-compose down
+- cdocker-compose downW
 ```
+
