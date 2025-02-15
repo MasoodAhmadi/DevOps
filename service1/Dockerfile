@@ -1,23 +1,16 @@
-# Dockerfile for service1
-FROM node:14
+FROM node:16-alpine
 
-# Set the working directory in the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json (if available) to install dependencies
-COPY package*.json ./
-COPY package-lock.json ./
+# Copy package.json (and package-lock.json if available)
+COPY package.json ./
+# Optionally: COPY package-lock.json ./
 
-# Install dependencies
 RUN npm install
 
-# Copy the rest of the application code
+# Copy the rest of your source code, including app.js
 COPY . .
 
-# Build the React app
-RUN npm run build
-# Expose the port on which the service will run
-EXPOSE 8199
+EXPOSE 5000
 
-# Start the application
 CMD ["npm", "start"]

@@ -1,61 +1,53 @@
 version: "3.5"
 
 services:
-  nginx:
-    image: nginx:latest
-    ports:
-      - "8198:80"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf 
-      - ./nginx/htpasswd:/etc/nginx/.htpasswd
-    depends_on:
-      - service1_instance1
-      - service1_instance2
-      - service1_instance3
-
   service1_instance1:
     build:
       context: ./service1
       dockerfile: Dockerfile
-    ports:
-      - "3000" 
+    expose:
+      - "5000"
     environment:
       - NODE_ENV=development
-    volumes:
-      - ./service1:/app 
-    command: ["sh", "-c", "sleep 2 && npm start"]
 
   service1_instance2:
     build:
       context: ./service1
       dockerfile: Dockerfile
-    ports:
-      - "3000"
+    expose:
+      - "5000"
     environment:
       - NODE_ENV=development
-    volumes:
-      - ./service1:/app
-    command: ["sh", "-c", "sleep 2 && npm start"]
 
   service1_instance3:
     build:
       context: ./service1
       dockerfile: Dockerfile
-    ports:
-      - "3000"
+    expose:
+      - "5000"
     environment:
       - NODE_ENV=development
-    volumes:
-      - ./service1:/app
-    command: ["sh", "-c", "sleep 2 && npm start"]
 
   service2:
     build:
       context: ./service2
       dockerfile: Dockerfile
-    ports:
-      - "8080:3001"
+    expose:
+      - "3000"
     environment:
       - NODE_ENV=development
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - "8198:80"
     volumes:
-      - ./service2:/app
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/.htpasswd:/etc/nginx/.htpasswd
+    depends_on:
+      - service1_instance1
+      - service1_instance2
+      - service1_instance3
+      - service2
