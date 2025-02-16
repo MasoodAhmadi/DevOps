@@ -1,13 +1,14 @@
 image: docker:latest
 
 services:
-  - name: docker:20.10.21 # Use Docker-in-Docker for building images
-    command: ["--tls=false"] # Disable TLS for easier local debugging
+  - name: docker:20.10.21-dind
+    alias: docker # Ensure the service is accessible as 'docker'
+    command: ["--tls=false", "--host=tcp://0.0.0.0:2375"] # Fix HOST/PORT issue
 
-variables:
-  DOCKER_HOST: "tcp://docker:2375" # Connect to the Docker daemon
-  DOCKER_TLS_CERTDIR: "" # Disable TLS, since it's not set up
-  DOCKER_DRIVER: "overlay2"
+# variables:
+#   DOCKER_HOST: "tcp://docker:2375" # Ensure CI jobs use the right Docker daemon
+#   DOCKER_TLS_CERTDIR: "" # Disable TLS to prevent connection issues
+#   DOCKER_DRIVER: "overlay2"
 
 stages:
   - build
@@ -17,9 +18,8 @@ stages:
 build:
   stage: build
   script:
-    - echo "Waiting for Docker to start..."
-    - until docker info; do sleep 3; done # Wait for Docker to be ready
-    - echo "Docker is running!"
+    - unset DOCKER_HOST
+    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
     - docker-compose build # Build all services
   only:
     - project
