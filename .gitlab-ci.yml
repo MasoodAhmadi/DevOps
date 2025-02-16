@@ -16,9 +16,9 @@ build:
     - docker:20.10.21-dind
   script:
     - echo "Waiting for Docker daemon to be ready..."
-    - until docker info; do sleep 1; done # Wait until the Docker daemon is ready
-    - echo "Building Docker images..."
+    - until docker info; do sleep 1; done # Wait until Docker is ready
     - docker-compose build
+
   artifacts:
     expire_in: 1 hour
     paths:
