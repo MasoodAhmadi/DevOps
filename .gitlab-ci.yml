@@ -1,42 +1,40 @@
-image: docker:latest
-
+image: docker:24.0.5
 services:
-  - name: docker:23.0.1-dind # Use Docker-in-Docker service
-    alias: docker # Ensure the service is accessible as 'docker'
-    command: ["--tls=false", "--host=tcp://0.0.0.0:2375"] # Fix HOST/PORT issue
+  - name: docker:24.0.5-dind
+    # Critical: Use IP instead of hostname
+    command:
+      - --tls=false
+      - --host=tcp://0.0.0.0:2375
 
-# variables:
-#   DOCKER_HOST: "tcp://docker:2375" # Ensure CI jobs use the right Docker daemon
-#   DOCKER_TLS_CERTDIR: "" # Disable TLS to prevent connection issues
-#   DOCKER_DRIVER: "overlay2"
+variables:
+  # Explicitly use TCP connection without hostname
+  DOCKER_HOST: tcp://127.0.0.1:2375
+  DOCKER_TLS_CERTDIR: ""
 
 stages:
   - build
   - test
   - deploy
 
+# Build Stage
 build:
   stage: build
   script:
-    - unset DOCKER_HOST
-    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
-    - docker-compose build # Build all services
-  only:
-    - project
+    # Build Docker image using Dockerfile
+    - docker-compose build
 
+# Test Stage
 test:
   stage: test
   script:
-    - echo "Running test phase"
-  only:
-    - project
+    - echo "test phase running"
 
+  after_script:
+    - docker-compose down
+
+# Deploy Stage
 deploy:
   stage: deploy
   script:
+    - docker-compose down --remove-orphans
     - docker-compose up -d
-    - echo "Deployment completed!"
-  dependencies:
-    - build
-  only:
-    - project
