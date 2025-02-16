@@ -17,7 +17,9 @@ build:
   stage: build
   image: docker:20.10.21
   services:
-    - docker:20.10.21-dind # Docker-in-Docker service for building images
+    - name: docker:20.10.21-dind
+  command: ["--privileged"]
+
   script:
     - echo "Checking the repository structure..."
     - ls -alh # List files in the repository to verify if docker-compose.yml is present
