@@ -18,7 +18,8 @@ build:
   image: docker:20.10.21
   services:
     - name: docker:20.10.21-dind
-      command: ["--privileged"] # Move the command under the service
+      alias: docker
+      command: ["--privileged"]
 
   script:
     - echo "Checking the repository structure..."
@@ -36,7 +37,8 @@ test:
   image: docker:20.10.21
   services:
     - name: docker:20.10.21-dind
-      command: ["--privileged"] # Move the command under the service
+      alias: docker
+      command: ["--privileged"]
 
   script:
     - echo "Starting test environment..."
@@ -58,7 +60,8 @@ deploy:
   image: docker:20.10.21
   services:
     - name: docker:20.10.21-dind
-      command: ["--privileged"] # Move the command under the service
+      alias: docker
+      command: ["--privileged"]
 
   script:
     - echo "Starting containers in detached mode..."
