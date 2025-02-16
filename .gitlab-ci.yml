@@ -8,8 +8,6 @@ image: docker:20.10.21
 
 # Variables to configure Docker and Docker Compose
 variables:
-  DOCKER_DRIVER: overlay2
-  DOCKER_TLS_CERTDIR: "/certs"
   DOCKER_HOST: "tcp://docker:2375" # Ensure the correct Docker host is used
 
 # Build stage: Build the Docker images for all services in docker-compose.yml
