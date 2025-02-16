@@ -4,8 +4,9 @@ stages:
   - deploy
 
 variables:
-  # Use overlay2 driver for Docker if needed
   DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: "/certs" # Required for DinD
+  DOCKER_HOST: "tcp://docker:2375" # Set to connect to Docker-in-Docker
 
 # Build stage: Build Docker images for your services
 build:
@@ -21,7 +22,6 @@ build:
       - docker-compose.yml
 
 # Test stage: Run your tests from the tests/ folder.
-# Here we assume you have a test script (e.g., tests/run_tests.sh) that makes HTTP calls
 test:
   stage: test
   image: docker:20.10.21
@@ -31,7 +31,8 @@ test:
     - echo "Starting test environment..."
     - docker-compose up -d
     - echo "Waiting for services to be ready..."
-    - sleep 10
+    - sleep 10 # Ensure services have started
+    - docker-compose ps # Check the status of services (optional)
     - echo "Running API tests..."
     - chmod +x tests/run_tests.sh
     - ./tests/run_tests.sh
@@ -49,4 +50,4 @@ deploy:
   script:
     - docker-compose up -d
   only:
-    - master # Only deploy when pushing to the master branch
+    - project # Only deploy when pushing to the master branch
