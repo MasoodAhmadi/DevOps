@@ -18,7 +18,6 @@ build:
   image: docker:20.10.21
   services:
     - docker:20.10.21-dind # Docker-in-Docker service for building images
-  privileged: true # Allow privileged mode for Docker-in-Docker
   script:
     - echo "Checking the repository structure..."
     - ls -alh # List files in the repository to verify if docker-compose.yml is present
@@ -35,7 +34,6 @@ test:
   image: docker:20.10.21
   services:
     - docker:20.10.21-dind # Docker-in-Docker service for running containers
-  privileged: true # Allow privileged mode for Docker-in-Docker
   script:
     - echo "Starting test environment..."
     - docker-compose up -d # Start containers in detached mode
@@ -56,7 +54,6 @@ deploy:
   image: docker:20.10.21
   services:
     - docker:20.10.21-dind # Docker-in-Docker service for deploying
-  privileged: true # Allow privileged mode for Docker-in-Docker
   script:
     - echo "Starting containers in detached mode..."
     - docker-compose up -d # Start the containers in detached mode
