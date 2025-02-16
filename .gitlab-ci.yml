@@ -15,7 +15,7 @@ build:
   services:
     - name: docker:20.10.21-dind
       alias: docker
-      privileged: true
+      # privileged: true
 
   script:
     - echo "Waiting for Docker daemon to be ready..."
