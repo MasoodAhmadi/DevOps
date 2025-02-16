@@ -3,21 +3,8 @@ stages:
   - test
   - deploy
 
-# Define a global Docker image for the entire pipeline
-image: docker:20.10.21
-
-# Variables to configure Docker and Docker Compose
-variables:
-  DOCKER_DRIVER: overlay2
-  DOCKER_TLS_CERTDIR: "/certs"
-  DOCKER_HOST: "tcp://docker:2375" # Use Docker in Docker (DinD)
-
-# Build stage: Build the Docker image for NGINX application
 build:
   stage: build
-  image: docker:20.10.21
-  services:
-    - docker:20.10.21-dind # Docker-in-Docker service for building images
   script:
     - echo "Building the Docker image for the NGINX application..."
     - docker-compose build # Build the Docker image using docker-compose
