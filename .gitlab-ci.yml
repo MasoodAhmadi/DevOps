@@ -1,0 +1,52 @@
+stages:
+  - build
+  - test
+  - deploy
+
+variables:
+  # Use overlay2 driver for Docker if needed
+  DOCKER_DRIVER: overlay2
+
+# Build stage: Build Docker images for your services
+build:
+  stage: build
+  image: docker:20.10.21
+  services:
+    - docker:20.10.21-dind
+  script:
+    - docker-compose build
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - docker-compose.yml
+
+# Test stage: Run your tests from the tests/ folder.
+# Here we assume you have a test script (e.g., tests/run_tests.sh) that makes HTTP calls
+test:
+  stage: test
+  image: docker:20.10.21
+  services:
+    - docker:20.10.21-dind
+  script:
+    - echo "Starting test environment..."
+    - docker-compose up -d
+    - echo "Waiting for services to be ready..."
+    - sleep 10
+    - echo "Running API tests..."
+    - chmod +x tests/run_tests.sh
+    - ./tests/run_tests.sh
+  artifacts:
+    when: always
+    paths:
+      - test-reports/
+
+# Deploy stage: Deploy the system (start containers in detached mode)
+deploy:
+  stage: deploy
+  image: docker:20.10.21
+  services:
+    - docker:20.10.21-dind
+  script:
+    - docker-compose up -d
+  only:
+    - master # Only deploy when pushing to the master branch
