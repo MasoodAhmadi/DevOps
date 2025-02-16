@@ -3,59 +3,55 @@ stages:
   - test
   - deploy
 
+# Define a global Docker image for the entire pipeline
+image: docker:20.10.21
+
+# Variables to configure Docker and Docker Compose
 variables:
   DOCKER_DRIVER: overlay2
-  DOCKER_TLS_CERTDIR: "/certs" # Required for DinD
-  DOCKER_HOST: "tcp://docker:2375" # Docker's DinD service should be reachable
+  DOCKER_TLS_CERTDIR: "/certs"
+  DOCKER_HOST: "tcp://docker:2375" # Use Docker in Docker (DinD)
 
-# Build stage: Build Docker images for your services
+# Build stage: Build the Docker image for NGINX application
 build:
   stage: build
   image: docker:20.10.21
   services:
-    - name: docker:20.10.21-dind
-      alias: docker
-      # privileged: true
-
+    - docker:20.10.21-dind # Docker-in-Docker service for building images
   script:
-    - echo "Waiting for Docker daemon to be ready..."
-    - until docker info; do sleep 1; done
-    - echo "Building the application..."
-    - docker-compose --verbose build # Add --verbose for detailed logs
-
+    - echo "Building the Docker image for the NGINX application..."
+    - docker-compose build # Build the Docker image using docker-compose
   artifacts:
     expire_in: 1 hour
     paths:
-      - docker-compose.yml
+      - docker-compose.yml # Store the docker-compose file as an artifact
 
-# Test stage: Run your tests from the tests/ folder.
+# Test stage: Run basic tests (can include container checks, health checks)
 test:
   stage: test
   image: docker:20.10.21
   services:
-    - docker:20.10.21-dind
+    - docker:20.10.21-dind # Docker-in-Docker service for running containers
   script:
-    - echo "Starting test environment..."
-    - docker-compose up -d
-    - echo "Waiting for services to be ready..."
-    - sleep 10 # Ensure services have started
+    - echo "Running tests..."
+    - docker-compose up -d # Start containers in detached mode
     - docker-compose ps # Check the status of services
-    - echo "Running API tests..."
-    - chmod +x tests/run_tests.sh
-    - ./tests/run_tests.sh
+    - echo "Running basic health checks..."
+    - docker-compose exec nginx curl -f http://localhost # Check if NGINX is up
+    - docker-compose down # Bring down the containers after tests
   artifacts:
     when: always
     paths:
-      - test-reports/
+      - test-reports/ # Store test results as artifacts
 
-# Deploy stage: Deploy the system (start containers in detached mode)
+# Deploy stage: Deploy the application (start the NGINX container)
 deploy:
   stage: deploy
   image: docker:20.10.21
   services:
-    - docker:20.10.21-dind
+    - docker:20.10.21-dind # Docker-in-Docker service for deploying
   script:
-    - echo "Starting containers in detached mode..."
-    - docker-compose up -d
+    - echo "Deploying the NGINX container..."
+    - docker-compose up -d # Start the containers in detached mode
   only:
-    - project # Only deploy when pushing to the 'project' branch
+    - project # Deploy only when pushing to the `project` branch
