@@ -6,18 +6,22 @@ stages:
 variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: "/certs" # Required for DinD
-  DOCKER_HOST: "tcp://localhost:2375" # Use localhost to avoid DNS issues
+  DOCKER_HOST: "tcp://docker:2375" # Docker's DinD service should be reachable
 
 # Build stage: Build Docker images for your services
 build:
   stage: build
   image: docker:20.10.21
   services:
-    - docker:20.10.21-dind
+    - name: docker:20.10.21-dind
+      alias: docker
+      privileged: true
+
   script:
     - echo "Waiting for Docker daemon to be ready..."
-    - until docker info; do sleep 1; done # Wait until Docker is ready
-    - docker-compose build
+    - until docker info; do sleep 1; done
+    - echo "Building the application..."
+    - docker-compose --verbose build # Add --verbose for detailed logs
 
   artifacts:
     expire_in: 1 hour
