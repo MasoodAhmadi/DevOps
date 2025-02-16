@@ -6,7 +6,7 @@ stages:
 variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: "/certs" # Required for DinD
-  DOCKER_HOST: "tcp://docker:2375" # Set to connect to Docker-in-Docker
+  DOCKER_HOST: "tcp://docker:2375" # Explicitly set Docker host
 
 # Build stage: Build Docker images for your services
 build:
@@ -15,6 +15,7 @@ build:
   services:
     - docker:20.10.21-dind
   script:
+    - echo "Building Docker images..."
     - docker-compose build
   artifacts:
     expire_in: 1 hour
@@ -32,7 +33,7 @@ test:
     - docker-compose up -d
     - echo "Waiting for services to be ready..."
     - sleep 10 # Ensure services have started
-    - docker-compose ps # Check the status of services (optional)
+    - docker-compose ps # Check the status of services
     - echo "Running API tests..."
     - chmod +x tests/run_tests.sh
     - ./tests/run_tests.sh
@@ -48,6 +49,7 @@ deploy:
   services:
     - docker:20.10.21-dind
   script:
+    - echo "Starting containers in detached mode..."
     - docker-compose up -d
   only:
     - project # Only deploy when pushing to the master branch
