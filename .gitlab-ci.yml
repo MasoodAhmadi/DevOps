@@ -10,7 +10,7 @@ image: docker:20.10.21
 variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: "/certs"
-  DOCKER_HOST: "tcp://localhost:2375" # Ensure the correct Docker host is used
+  DOCKER_HOST: "tcp://docker:2375" # Ensure the correct Docker host is used
 
 # Build stage: Build the Docker images for all services in docker-compose.yml
 build:
@@ -18,7 +18,7 @@ build:
   image: docker:20.10.21
   services:
     - name: docker:20.10.21-dind
-  command: ["--privileged"]
+      command: ["--privileged"] # Move the command under the service
 
   script:
     - echo "Checking the repository structure..."
@@ -35,7 +35,9 @@ test:
   stage: test
   image: docker:20.10.21
   services:
-    - docker:20.10.21-dind # Docker-in-Docker service for running containers
+    - name: docker:20.10.21-dind
+      command: ["--privileged"] # Move the command under the service
+
   script:
     - echo "Starting test environment..."
     - docker-compose up -d # Start containers in detached mode
@@ -55,7 +57,9 @@ deploy:
   stage: deploy
   image: docker:20.10.21
   services:
-    - docker:20.10.21-dind # Docker-in-Docker service for deploying
+    - name: docker:20.10.21-dind
+      command: ["--privileged"] # Move the command under the service
+
   script:
     - echo "Starting containers in detached mode..."
     - docker-compose up -d # Start the containers in detached mode
