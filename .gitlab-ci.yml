@@ -1,12 +1,12 @@
 image: docker:latest
 
 services:
-  - docker:20.10.21-dind # Use a stable version of Docker-in-Docker
+  - docker:20.10.21-dind
 
 variables:
-  DOCKER_DRIVER: overlay2
-  DOCKER_TLS_CERTDIR: "" # Disable TLS because we're using an insecure connection
-  DOCKER_HOST: "tcp://localhost:2375" # Ensure the correct Docker socket is used
+  DOCKER_TLS_CERTDIR: "" # Disable TLS because we use an insecure connection
+  DOCKER_HOST: "tcp://docker:2375" # Set correct Docker host
+  DOCKER_DRIVER: "overlay2"
 
 stages:
   - build
@@ -16,11 +16,12 @@ stages:
 build:
   stage: build
   script:
-    - echo "Waiting for Docker daemon to be ready..."
-    - until docker info; do sleep 1; done # Wait for Docker to be ready
-    - docker-compose build # Build all services
+    - echo "Waiting for Docker to be ready..."
+    - until docker info; do sleep 1; done
+    - echo "Docker is now ready!"
+    - docker-compose build
   only:
-    - project # Run this job only when the project branch is updated
+    - project
 
 test:
   stage: test
@@ -32,7 +33,7 @@ test:
 deploy:
   stage: deploy
   script:
-    - docker-compose up --build -d # Start all services in detached mode
+    - docker-compose up -d
     - echo "Deployment completed!"
   dependencies:
     - build
