@@ -40,5 +40,4 @@ build:
     expire_in: 1 hour
     paths:
       - docker-compose.yml # Store docker-compose file as an artifact
-  tags:
-    - token1
+
