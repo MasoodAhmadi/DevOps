@@ -1,7 +1,7 @@
 image: docker:latest
 
 services:
-  - name: docker:20.10.21-dind
+  - name: docker:23.0.1-dind
     command: ["--tls=false"] # Disable TLS for easier local debugging
 
 variables:
