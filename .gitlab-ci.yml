@@ -3,15 +3,30 @@ stages:
   - test
   - deploy
 
+# Define a global Docker image for the entire pipeline
+image: docker:20.10.21
+
+# Variables to configure Docker and Docker Compose
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: "/certs"
+  DOCKER_HOST: "tcp://docker:2375" # Use Docker-in-Docker (DinD)
+
+# Build stage: Build the Docker images for all services in docker-compose.yml
 build:
   stage: build
+  image: docker:20.10.21
+  services:
+    - docker:20.10.21-dind # Docker-in-Docker service for building images
   script:
-    - echo "Building the Docker image for the NGINX application..."
-    - docker-compose build # Build the Docker image using docker-compose
+    - echo "Checking the repository structure..."
+    - ls -alh # List files in the repository to verify if docker-compose.yml is present
+    - echo "Building the Docker images using docker-compose..."
+    - docker-compose -f docker-compose.yml build # Explicitly reference docker-compose.yml
   artifacts:
     expire_in: 1 hour
     paths:
-      - docker-compose.yml # Store the docker-compose file as an artifact
+      - docker-compose.yml # Store docker-compose file as an artifact
 
 # Test stage: Run basic tests (can include container checks, health checks)
 test:
@@ -20,8 +35,10 @@ test:
   services:
     - docker:20.10.21-dind # Docker-in-Docker service for running containers
   script:
-    - echo "Running tests..."
+    - echo "Starting test environment..."
     - docker-compose up -d # Start containers in detached mode
+    - echo "Waiting for services to be ready..."
+    - sleep 10 # Ensure services have started
     - docker-compose ps # Check the status of services
     - echo "Running basic health checks..."
     - docker-compose exec nginx curl -f http://localhost # Check if NGINX is up
@@ -38,7 +55,7 @@ deploy:
   services:
     - docker:20.10.21-dind # Docker-in-Docker service for deploying
   script:
-    - echo "Deploying the NGINX container..."
+    - echo "Starting containers in detached mode..."
     - docker-compose up -d # Start the containers in detached mode
   only:
     - project # Deploy only when pushing to the `project` branch
