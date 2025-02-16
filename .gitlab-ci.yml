@@ -2,12 +2,12 @@ image: docker:latest
 
 services:
   - name: docker:20.10.21-dind
-    command: ["--tls=false"] # Disable TLS to allow non-secure communication
+    command: ["--tls=false"] # Disable TLS for easier local debugging
 
 variables:
-  DOCKER_HOST: "tcp://docker:2375" # Use this to connect to DinD
+  DOCKER_HOST: "tcp://docker:2375" # Connect to the Docker daemon
+  DOCKER_TLS_CERTDIR: "" # Disable TLS, since it's not set up
   DOCKER_DRIVER: "overlay2"
-  DOCKER_TLS_CERTDIR: "" # Important: Disable TLS if not using secure connection
 
 stages:
   - build
@@ -18,9 +18,9 @@ build:
   stage: build
   script:
     - echo "Waiting for Docker to start..."
-    - until docker info; do sleep 1; done # Wait until Docker is up
+    - until docker info; do sleep 3; done # Wait for Docker to be ready
     - echo "Docker is running!"
-    - docker-compose build
+    - docker-compose build # Build all services
   only:
     - project
 
