@@ -8,19 +8,17 @@ image: docker:20.10.21
 # Variables to configure Docker and Docker Compose
 services:
   - name: docker:20.10.21-dind
-    alias: docker # Change alias to docker to match DOCKER_HOST
+    alias: docker # Ensure the alias is correct
 
 variables:
-  # Tell Docker CLI how to talk to the Docker daemon
-  DOCKER_HOST: tcp://docker:2375 # Use docker as the hostname
+  DOCKER_HOST: "tcp://docker:2375" # This should be correct with alias 'docker'
   DOCKER_DRIVER: overlay2 # Use the overlayfs driver for improved performance
   DOCKER_TLS_CERTDIR: "" # Disable TLS for simplicity
 
 before_script:
-  - echo "ifconfig"
-  - ifconfig
-  - nslookup 130.230.224.10
-  - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY # Secure login to registry
+  - echo "Waiting for Docker daemon to start..."
+  - until docker info; do sleep 2; done # Wait for Docker to be ready
+  - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY" # Secure login
 
 # Build stage: Build the Docker images for all services in docker-compose.yml
 build:
