@@ -11,7 +11,7 @@ services:
     alias: docker # Ensure the alias is correct
 
 variables:
-  DOCKER_HOST: "tcp://docker:2375" # This should be correct with alias 'docker'
+  DOCKER_HOST: "tcp://130.230.224.10:2375" # This should be correct with alias 'docker'
   DOCKER_DRIVER: overlay2 # Use the overlayfs driver for improved performance
   DOCKER_TLS_CERTDIR: "" # Disable TLS for simplicity
 
