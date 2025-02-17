@@ -15,7 +15,7 @@ image: docker:20.10.21
 services:
   - name: docker:20.10.21-dind
     alias: thedockerhost
-    privileged: true # Ensures Docker-in-Docker can run properly
+    privileged: "true" # Ensures Docker-in-Docker can run properly
 
 variables:
   # Tell docker CLI how to talk to Docker daemon; see
