@@ -3,6 +3,7 @@ stages:
   - test
   - deploy
 
+# Define a global Docker image for the entire pipeline
 image: docker:20.10.21
 
 # Variables to configure Docker and Docker Compose
@@ -31,7 +32,6 @@ build:
   stage: build
   image: docker:20.10.21
   script:
-    - echo "I am here"
     - echo "Checking the repository structure..."
     - ls -alh # List files in the repository to verify if docker-compose.yml is present
     - echo "Building the Docker images using docker-compose..."
@@ -40,3 +40,24 @@ build:
     expire_in: 1 hour
     paths:
       - docker-compose.yml # Store docker-compose file as an artifact
+  tags:
+    - ansible
+
+test:
+  stage: test
+  image: docker:20.10.21
+  script:
+    - echo "Start the test environment"
+    - docker-compose up -d
+    - echo "Wait for services to be read"
+    - sleep 10
+    - docker-compose ps
+    - echo "Running nginx check"
+    - docker-compose exec nginx curl f http://localhost
+    - docker-compose down
+  artifacts:
+    when: always
+    paths:
+      - test-reports/ # Store test results as artifacts
+  tags:
+    - ansible
