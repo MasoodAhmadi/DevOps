@@ -1,55 +1,73 @@
-image: docker:24.0.5 # ✅ Use the latest stable Docker image
-
-services:
-  - name: docker:24.0.5-dind # ✅ Use matching DinD version
-    alias: docker # ✅ Ensure alias matches DOCKER_HOST
-    command: ["--tls=false", "--host=tcp://0.0.0.0:2375"] # ✅ Allow plain TCP
-
-variables:
-  DOCKER_HOST: "tcp://localhost:2375" # ✅ Use localhost instead of `docker`
-  DOCKER_TLS_CERTDIR: "" # ✅ Disable TLS to avoid cert issues
-  DOCKER_DRIVER: overlay2 # ✅ Use overlay2 for better performance
-
-before_script:
-  - echo "Waiting for Docker daemon to start..."
-  - until docker info; do sleep 2; done # ✅ Wait for Docker to be ready
-  - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY" # ✅ Secure login
-
 stages:
   - build
   - test
   - deploy
 
-# 🛠 Build Stage
+# Define a global Docker image for the entire pipeline
+image: docker:20.10.21
+
+# Variables to configure Docker and Docker Compose
+# variables:
+#   DOCKER_DRIVER: overlay2
+#   DOCKER_TLS_CERTDIR: "/certs"
+#   DOCKER_HOST: "tcp://docker:2375" # Use Docker-in-Docker (DinD)
+
+services:
+  - name: docker:20.10.21-dind
+    alias: thedockerhost
+
+variables:
+  # Tell docker CLI how to talk to Docker daemon; see
+  # https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#use-docker-in-docker-executor
+  DOCKER_HOST: tcp://thedockerhost:2375/
+  # Use the overlayfs driver for improved performance:
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+
+before_script:
+  - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+
+# Build stage: Build the Docker images for all services in docker-compose.yml
 build:
   stage: build
+  image: docker:20.10.21
   script:
-    - echo "Checking repository structure..."
-    - ls -alh # ✅ Verify `docker-compose.yml` exists
-    - echo "Building Docker images..."
-    - docker-compose build # ✅ Build all services without specifying the file
+    - echo "Checking the repository structure..."
+    - ls -alh # List files in the repository to verify if docker-compose.yml is present
+    - echo "Building the Docker images using docker-compose..."
+    - docker-compose -f docker-compose.yml build # Explicitly reference docker-compose.yml
   artifacts:
     expire_in: 1 hour
     paths:
-      - docker-compose.yml # ✅ Save docker-compose file
+      - docker-compose.yml # Store docker-compose file as an artifact
   tags:
-    - ansible
+    - token1
 
-# ✅ Ensure Docker is Ready Before Using It
 test:
   stage: test
+  image: docker:20.10.21
   script:
-    - echo "Starting test environment..."
+    - echo "Start the test environment"
     - docker-compose up -d
-    - echo "Waiting for services to be ready..."
+    - echo "Wait for services to be read"
     - sleep 10
     - docker-compose ps
-    - echo "Running nginx check..."
-    - docker-compose exec nginx curl -f http://localhost # ✅ Fix typo (`-f` was incorrect)
+    - echo "Running nginx check"
+    - docker-compose exec nginx curl f http://localhost
     - docker-compose down
   artifacts:
     when: always
     paths:
-      - test-reports/ # ✅ Save test results
+      - test-reports/ # Store test results as artifacts
+  tags:
+    - ansible
+
+deploy:
+  stage: deploy
+  image: docker:20.10.21
+  script:
+    - echo "Start the deploy environment"
+    - docker-compose up -d
+    - project
   tags:
     - ansible
