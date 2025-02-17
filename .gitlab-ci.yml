@@ -1,17 +1,17 @@
 image: docker:24.0.5 # ✅ Use the latest stable Docker image
 
 services:
-  - name: docker:24.0.5-dind # ✅ Use the latest stable DinD
-    alias: docker # ✅ Alias should match DOCKER_HOST
+  - name: docker:24.0.5-dind # ✅ Use the matching DinD service
+    alias: docker # ✅ Ensure alias matches DOCKER_HOST
 
 variables:
-  DOCKER_HOST: "tcp://docker:2375" # ✅ Ensure correct service alias
+  DOCKER_HOST: "tcp://docker:2375" # ✅ Correct hostname to match service alias
   DOCKER_TLS_CERTDIR: "" # ✅ Disable TLS for simplicity
   DOCKER_DRIVER: overlay2 # ✅ Improve performance
 
 before_script:
   - echo "Waiting for Docker daemon to start..."
-  - until docker info; do sleep 1; done # ✅ Wait for Docker to be ready
+  - until docker info; do sleep 2; done # ✅ Wait for Docker to be ready
   - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY" # ✅ Secure login
 
 stages:
@@ -24,7 +24,7 @@ build:
   stage: build
   script:
     - echo "Checking repository structure..."
-    - ls -alh # ✅ Ensure docker-compose.yml exists
+    - ls -alh # ✅ Verify docker-compose.yml exists
     - echo "Building Docker images..."
     - docker-compose -f docker-compose.yml build # ✅ Build all services
   artifacts:
