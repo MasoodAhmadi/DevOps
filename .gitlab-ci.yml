@@ -32,3 +32,4 @@ deploy:
     - docker-compose up -d
   tags:
     - ansible
+#work at this moment 17.02.2025 at 4:35
