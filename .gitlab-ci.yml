@@ -40,7 +40,7 @@ build:
     paths:
       - docker-compose.yml # Store docker-compose file as an artifact
   tags:
-    - ansible
+    -
 
 test:
   stage: test
@@ -59,4 +59,4 @@ test:
     paths:
       - test-reports/ # Store test results as artifacts
   tags:
-    - ansible
+    -
