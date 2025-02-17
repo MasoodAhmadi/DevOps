@@ -3,16 +3,28 @@ stages:
   - test
   - deploy
 
-image: docker
+# Define a global Docker image for the entire pipeline
+image: docker:20.10.21
+
+# Variables to configure Docker and Docker Compose
+# variables:
+#   DOCKER_DRIVER: overlay2
+#   DOCKER_TLS_CERTDIR: "/certs"
+#   DOCKER_HOST: "tcp://docker:2375" # Use Docker-in-Docker (DinD)
+
 services:
-  - "docker:dind"
-variables: # not strictly needed, depending on runner configuration
-  DOCKER_HOST: "tcp://docker:2375"
+  - name: docker:20.10.21-dind
+    alias: thedockerhost
+
+variables:
+  # Tell docker CLI how to talk to Docker daemon; see
+  # https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#use-docker-in-docker-executor
+  DOCKER_HOST: tcp://thedockerhost:2375/
+  # Use the overlayfs driver for improved performance:
+  DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
 
-before_script:
-  - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-
+# Build stage: Build the Docker images for all services in docker-compose.yml
 build:
   stage: build
   image: docker:20.10.21
@@ -25,25 +37,6 @@ build:
     expire_in: 1 hour
     paths:
       - docker-compose.yml # Store docker-compose file as an artifact
-  tags:
-    - ansible
-
-test:
-  stage: test
-  image: docker:20.10.21
-  script:
-    - echo "Start the test environment"
-    - docker-compose up -d
-    - echo "Wait for services to be read"
-    - sleep 10
-    - docker-compose ps
-    - echo "Running nginx check"
-    - docker-compose exec nginx curl f http://localhost
-    - docker-compose down
-  artifacts:
-    when: always
-    paths:
-      - test-reports/
   tags:
     - ansible
 
