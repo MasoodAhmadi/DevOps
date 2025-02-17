@@ -26,7 +26,6 @@ before_script:
   - until docker info; do sleep 2; done # Wait until Docker is ready
   - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY" # Secure login
 
-# Build stage: Build the Docker images using docker-compose
 build:
   stage: build
   script:
