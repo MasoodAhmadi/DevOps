@@ -6,7 +6,6 @@ stages:
 # Define a global Docker image for the entire pipeline
 image: docker:20.10.21
 
-# Variables to configure Docker and Docker Compose
 # variables:
 #   DOCKER_DRIVER: overlay2
 #   DOCKER_TLS_CERTDIR: "/certs"
