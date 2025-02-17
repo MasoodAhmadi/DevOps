@@ -3,30 +3,35 @@ stages:
   - test
   - deploy
 
+# Use the latest stable Docker image
 image: docker:20.10.21
 
-# Variables to configure Docker and Docker Compose
+# Configure Docker-in-Docker (DinD) with the appropriate service
 services:
   - name: docker:20.10.21-dind
-    alias: docker # Ensure the alias is correct
+    alias: docker
+    # privileged: true # Enable privileged mode for Docker-in-Docker
+    entrypoint: ["docker-entrypoint.sh"]
 
 variables:
-  DOCKER_HOST: "tcp://130.230.224.10:2375" # This should be correct with alias 'docker'
-  DOCKER_DRIVER: overlay2 # Use the overlayfs driver for improved performance
+  # Docker configuration
+  DOCKER_HOST: "tcp://docker:2375" # Ensure this matches the alias of the Docker service
+  DOCKER_DRIVER: overlay2 # Use overlay2 for Docker storage driver
   DOCKER_TLS_CERTDIR: "" # Disable TLS for simplicity
+  DOCKER_CLI_EXPERIMENTAL: "enabled" # Enable Docker experimental features (if needed)
 
 before_script:
+  # Ensure Docker is fully started and ready
   - echo "Waiting for Docker daemon to start..."
-  - until docker info; do sleep 2; done # Wait for Docker to be ready
+  - until docker info; do sleep 2; done # Wait until Docker is ready
   - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY" # Secure login
 
-# Build stage: Build the Docker images for all services in docker-compose.yml
+# Build stage: Build the Docker images using docker-compose
 build:
   stage: build
-  image: docker:20.10.21
   script:
     - echo "Checking the repository structure..."
-    - ls -alh # List files in the repository to verify if docker-compose.yml is present
+    - ls -alh # List files to ensure docker-compose.yml exists
     - echo "Building the Docker images using docker-compose..."
     - docker-compose -f docker-compose.yml build # Explicitly reference docker-compose.yml
   artifacts:
@@ -36,30 +41,31 @@ build:
   tags:
     - ansible
 
+# Test stage: Start services using docker-compose and run tests
 test:
   stage: test
-  image: docker:20.10.21
   script:
-    - echo "Start the test environment"
-    - docker-compose up -d
-    - echo "Wait for services to be ready"
-    - sleep 10
-    - docker-compose ps
-    - echo "Running nginx check"
-    - docker-compose exec nginx curl -f http://localhost # Fixed the typo (`-f`)
-    - docker-compose down
+    - echo "Starting test environment..."
+    - docker-compose up -d # Start services in detached mode
+    - echo "Waiting for services to be ready..."
+    - sleep 10 # Wait for services to initialize
+    - docker-compose ps # Verify if services are up
+    - echo "Running nginx check..."
+    - docker-compose exec nginx curl -f http://localhost # Perform health check on nginx service
+    - docker-compose down # Tear down the environment after testing
   artifacts:
     when: always
     paths:
-      - test-reports/ # Store test results as artifacts
+      - test-reports/ # Save test reports as artifacts
   tags:
     - ansible
 
+# Deploy stage: Deploy the services using docker-compose
 deploy:
   stage: deploy
-  image: docker:20.10.21
   script:
-    - echo "Start the deploy environment"
-    - docker-compose up -d
+    - echo "Starting deploy environment..."
+    - docker-compose up -d # Deploy services in detached mode
+    # Add additional deploy steps here as necessary (e.g., pushing to production)
   tags:
     - ansible
