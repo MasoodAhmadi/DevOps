@@ -1,43 +1,42 @@
-image: docker:latest
-
-services:
-  - name: docker:20.10.21-dind
-    alias: docker # Ensure the service is accessible as 'docker'
-    command: ["--tls=false", "--host=tcp://0.0.0.0:2375"] # Fix HOST/PORT issue
-
-variables:
-  DOCKER_HOST: "tcp://docker:2375" # Ensure CI jobs use the right Docker daemon
-  DOCKER_TLS_CERTDIR: "" # Disable TLS to prevent connection issues
-  DOCKER_DRIVER: "overlay2"
-
 stages:
   - build
   - test
   - deploy
 
+# Define a global Docker image for the entire pipeline
+image: docker:20.10.21
+
+# Variables to configure Docker and Docker Compose
+# variables:
+#   DOCKER_DRIVER: overlay2
+#   DOCKER_TLS_CERTDIR: "/certs"
+#   DOCKER_HOST: "tcp://docker:2375" # Use Docker-in-Docker (DinD)
+
+services:
+  - name: docker:20.10.21-dind
+    alias: thedockerhost
+
+variables:
+  # Tell docker CLI how to talk to Docker daemon; see
+  # https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#use-docker-in-docker-executor
+  DOCKER_HOST: tcp://thedockerhost:2375/
+  # Use the overlayfs driver for improved performance:
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+
+before_script:
+  - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+
+# Build stage: Build the Docker images for all services in docker-compose.yml
 build:
   stage: build
+  image: docker:20.10.21
   script:
-    - echo "Waiting for Docker to start..."
-    - until docker info; do sleep 3; done # Wait until Docker is ready
-    - echo "Docker is running!"
-    - docker-compose build # Build all services
-  only:
-    - project
-
-test:
-  stage: test
-  script:
-    - echo "Running test phase"
-  only:
-    - project
-
-deploy:
-  stage: deploy
-  script:
-    - docker-compose up -d
-    - echo "Deployment completed!"
-  dependencies:
-    - build
-  only:
-    - project
+    - echo "Checking the repository structure..."
+    - ls -alh # List files in the repository to verify if docker-compose.yml is present
+    - echo "Building the Docker images using docker-compose..."
+    - docker-compose -f docker-compose.yml build # Explicitly reference docker-compose.yml
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - docker-compose.yml # Store docker-compose file as an artifact
