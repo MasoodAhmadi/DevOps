@@ -1,13 +1,14 @@
 image: docker:24.0.5 # ✅ Use the latest stable Docker image
 
 services:
-  - name: docker:24.0.5-dind # ✅ Use the matching DinD service
+  - name: docker:24.0.5-dind # ✅ Use matching DinD version
     alias: docker # ✅ Ensure alias matches DOCKER_HOST
+    command: ["--tls=false", "--host=tcp://0.0.0.0:2375"] # ✅ Allow plain TCP
 
 variables:
-  DOCKER_HOST: "tcp://docker:2375" # ✅ Correct hostname to match service alias
-  DOCKER_TLS_CERTDIR: "" # ✅ Disable TLS for simplicity
-  DOCKER_DRIVER: overlay2 # ✅ Improve performance
+  DOCKER_HOST: "tcp://localhost:2375" # ✅ Use localhost instead of `docker`
+  DOCKER_TLS_CERTDIR: "" # ✅ Disable TLS to avoid cert issues
+  DOCKER_DRIVER: overlay2 # ✅ Use overlay2 for better performance
 
 before_script:
   - echo "Waiting for Docker daemon to start..."
@@ -24,9 +25,9 @@ build:
   stage: build
   script:
     - echo "Checking repository structure..."
-    - ls -alh # ✅ Verify docker-compose.yml exists
+    - ls -alh # ✅ Verify `docker-compose.yml` exists
     - echo "Building Docker images..."
-    - docker-compose -f docker-compose.yml build # ✅ Build all services
+    - docker-compose build # ✅ Build all services without specifying the file
   artifacts:
     expire_in: 1 hour
     paths:
