@@ -6,29 +6,21 @@ stages:
 image: docker:20.10.21
 
 # Variables to configure Docker and Docker Compose
-# variables:
-#   DOCKER_DRIVER: overlay2
-#   DOCKER_TLS_CERTDIR: "/certs"
-#   DOCKER_HOST: "tcp://docker:2375" # Use Docker-in-Docker (DinD)
-
 services:
   - name: docker:20.10.21-dind
-    alias: thedockerhost
-    # privileged: true # ✅ Enable privileged mode
+    alias: docker # Change alias to docker to match DOCKER_HOST
 
 variables:
-  # Tell docker CLI how to talk to Docker daemon; see
-  # https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#use-docker-in-docker-executor
-  DOCKER_HOST: tcp://thedockerhost:2375/
-  # Use the overlayfs driver for improved performance:
-  DOCKER_DRIVER: overlay2
-  DOCKER_TLS_CERTDIR: ""
+  # Tell Docker CLI how to talk to the Docker daemon
+  DOCKER_HOST: tcp://docker:2375 # Use docker as the hostname
+  DOCKER_DRIVER: overlay2 # Use the overlayfs driver for improved performance
+  DOCKER_TLS_CERTDIR: "" # Disable TLS for simplicity
 
 before_script:
   - echo "ifconfig"
   - ifconfig
   - nslookup 130.230.224.10
-  - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY # Secure login to registry
 
 # Build stage: Build the Docker images for all services in docker-compose.yml
 build:
@@ -52,11 +44,11 @@ test:
   script:
     - echo "Start the test environment"
     - docker-compose up -d
-    - echo "Wait for services to be read"
+    - echo "Wait for services to be ready"
     - sleep 10
     - docker-compose ps
     - echo "Running nginx check"
-    - docker-compose exec nginx curl f http://localhost
+    - docker-compose exec nginx curl -f http://localhost # Fixed the typo (`-f`)
     - docker-compose down
   artifacts:
     when: always
@@ -71,6 +63,5 @@ deploy:
   script:
     - echo "Start the deploy environment"
     - docker-compose up -d
-    - project
   tags:
     - ansible
