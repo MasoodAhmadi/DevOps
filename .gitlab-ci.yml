@@ -31,6 +31,7 @@ build:
   stage: build
   image: docker:20.10.21
   script:
+    - echo "I am here"
     - echo "Checking the repository structure..."
     - ls -alh # List files in the repository to verify if docker-compose.yml is present
     - echo "Building the Docker images using docker-compose..."
