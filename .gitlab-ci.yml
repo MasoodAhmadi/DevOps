@@ -3,28 +3,15 @@ stages:
   - test
   - deploy
 
-image: docker:20.10.21
-
-# variables:
-#   DOCKER_DRIVER: overlay2
-#   DOCKER_TLS_CERTDIR: "/certs"
-#   DOCKER_HOST: "tcp://docker:2375" # Use Docker-in-Docker (DinD)
-
+image: docker
 services:
-  - name: docker:20.10.21-dind
-    alias: thedockerhost
-
-variables:
-  # Tell docker CLI how to talk to Docker daemon; see
-  # https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#use-docker-in-docker-executor
-  # DOCKER_HOST: tcp://thedockerhost:2375/
+  - "docker:dind"
+variables: # not strictly needed, depending on runner configuration
   DOCKER_HOST: "tcp://docker:2375"
-  # Use the overlayfs driver for improved performance:
-  DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
 
-before_script:
-  - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+# before_script:
+#   - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
 
 # Build stage: Build the Docker images for all services in docker-compose.yml
 build:
@@ -58,5 +45,15 @@ test:
     when: always
     paths:
       - test-reports/
+  tags:
+    - ansible
+
+deploy:
+  stage: deploy
+  image: docker:20.10.21
+  script:
+    - echo "Start the deploy environment"
+    - docker-compose up -d
+    - project
   tags:
     - ansible
