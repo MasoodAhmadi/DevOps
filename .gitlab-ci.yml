@@ -13,7 +13,6 @@ variables: # not strictly needed, depending on runner configuration
 before_script:
   - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
 
-# Build stage: Build the Docker images for all services in docker-compose.yml
 build:
   stage: build
   image: docker:20.10.21
@@ -44,7 +43,7 @@ test:
   artifacts:
     when: always
     paths:
-      - test-reports/ # Store test results as artifacts
+      - test-reports/
   tags:
     - ansible
 
