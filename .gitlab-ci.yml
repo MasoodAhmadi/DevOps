@@ -57,6 +57,6 @@ test:
   artifacts:
     when: always
     paths:
-      - test-reports/ # Store test results as artifacts
+      - test-reports/
   tags:
     - ansible
