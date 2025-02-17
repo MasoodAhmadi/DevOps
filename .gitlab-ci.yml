@@ -3,24 +3,34 @@ stages:
   - test
   - deploy
 
+# Global Docker image
 image: docker:20.10.21
 
+# Variables to configure Docker and Docker Compose
 variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: "" # Disable TLS
 
+# Use Docker-in-Docker (DinD) service
 services:
   - name: docker:20.10.21-dind
-    alias: docker-dind
-    command: ["--tls=false", "--host", "tcp://0.0.0.0:2375"]
-
-# Mount Docker socket from host
-volumes:
-  - /var/run/docker.sock:/var/run/docker.sock
+    alias: docker-dind # Unique alias for Docker-in-Docker
+    command: ["--tls=false", "--host", "tcp://0.0.0.0:2375"] # Disable TLS
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock # Mount the Docker socket
 
 build:
   stage: build
   script:
+    - echo "Building Docker images..."
     - docker-compose -f docker-compose.yml build
+  tags:
+    - ansible
+
+deploy:
+  stage: deploy
+  script:
+    - echo "Start the deploy environment"
+    - docker-compose up -d
   tags:
     - ansible
