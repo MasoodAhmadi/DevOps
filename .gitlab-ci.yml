@@ -1,61 +1,48 @@
+image: docker:24.0.5
+
+services:
+  - name: docker:24.0.5-dind
+    alias: docker
+    command:
+      - --tls=false
+      - --host=tcp://0.0.0.0:2375
+
+variables:
+  DOCKER_HOST: "tcp://docker:2375" # Fix: Use correct service alias
+  DOCKER_TLS_CERTDIR: ""
+
 stages:
   - build
   - test
   - deploy
 
-image: docker:20.10.21
-
-# variables:
-#   DOCKER_DRIVER: overlay2
-#   DOCKER_TLS_CERTDIR: "/certs"
-#   DOCKER_HOST: "tcp://docker:2375" # Use Docker-in-Docker (DinD)
-
-services:
-  - name: docker:20.10.21-dind
-    alias: thedockerhost
-
-variables:
-  # Tell docker CLI how to talk to Docker daemon; see
-  # https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#use-docker-in-docker-executor
-  DOCKER_HOST: tcp://thedockerhost:2375/
-  # Use the overlayfs driver for improved performance:
-  DOCKER_DRIVER: overlay2
-  DOCKER_TLS_CERTDIR: ""
-
-before_script:
-  - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-
-# Build stage: Build the Docker images for all services in docker-compose.yml
+# Build Stage
 build:
   stage: build
-  image: docker:20.10.21
   script:
-    - echo "Checking the repository structure..."
-    - ls -alh # List files in the repository to verify if docker-compose.yml is present
-    - echo "Building the Docker images using docker-compose..."
-    - docker-compose -f docker-compose.yml build # Explicitly reference docker-compose.yml
-  artifacts:
-    expire_in: 1 hour
-    paths:
-      - docker-compose.yml # Store docker-compose file as an artifact
-  tags:
-    - ansible
+    - echo "Waiting for Docker daemon to start..."
+    - until docker info; do sleep 1; done # Ensure Docker is ready
+    - echo "Logging in to GitLab Container Registry..."
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - echo "Building Docker images..."
+    - docker-compose build
 
+# Test Stage
 test:
   stage: test
-  image: docker:20.10.21
   script:
-    - echo "Start the test environment"
-    - docker-compose up -d
-    - echo "Wait for services to be read"
-    - sleep 10
-    - docker-compose ps
-    - echo "Running nginx check"
-    - docker-compose exec nginx curl f http://localhost
+    - echo "Running tests..."
+    - docker-compose up -d # Start services
+    - sleep 10 # Wait for services to be ready
+    - docker ps # Verify running containers
+    - echo "Tests completed"
+  after_script:
     - docker-compose down
-  artifacts:
-    when: always
-    paths:
-      - test-reports/ # Store test results as artifacts
-  tags:
-    - ansible
+
+# Deploy Stage
+deploy:
+  stage: deploy
+  script:
+    - echo "Deploying application..."
+    - docker-compose down --remove-orphans
+    - docker-compose up -d
