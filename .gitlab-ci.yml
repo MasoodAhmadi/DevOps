@@ -30,7 +30,7 @@ test:
   image: node:21.6.2 # Match Node.js version used in local dev
   script:
     - echo "Checking files in the working directory..."
-    - echo "docker ps"
+    - docker ps
     - ls -al # List files to ensure we are in the right directory
     - cd tests # Change to the service2 directory
     - ls -al # Check that package.json is in the service2 directory
