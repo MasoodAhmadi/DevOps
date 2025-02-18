@@ -31,7 +31,7 @@ test:
   script:
     - echo "Checking files in the working directory..."
     - ls -al tests # Check if test_service2.sh exists inside 'tests/'
-    - chmod +x tests/test_service2.sh # Make sure it's executable
+    # - chmod +x tests/test_service2.sh # Make sure it's executable
     - npm install # Install dependencies for service2 (including jest)
     - echo "Starting Service2..."
     - docker-compose -f docker-compose.yml up -d service2 # Start Service2 in the background using Docker Compose
