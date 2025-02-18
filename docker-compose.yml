@@ -36,6 +36,8 @@ services:
       - "3000"
     environment:
       - NODE_ENV=development
+    networks:
+      - dev_network
 
   nginx:
     build:
@@ -51,6 +53,8 @@ services:
       - service1_instance2
       - service1_instance3
       - service2
+    networks:
+      - dev_network
 
   tests:
     build:
@@ -60,4 +64,10 @@ services:
       - service2 # Ensure service2 is up before running tests
     environment:
       - NODE_ENV=test
-    command: ["npm", "test"] # Run the tests with the npm test command
+    command: ["npm", "test"]
+    networks:
+      - dev_network # Ensure the tests service is on the same network as service2
+
+networks:
+  dev_network:
+    driver: bridge
