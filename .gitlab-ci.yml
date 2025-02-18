@@ -25,11 +25,11 @@ build:
   tags:
     - ansible
 
-deploy:
-  stage: deploy
+test:
+  stage: test
   script:
-    - echo "Start the deploy environment"
-    - docker-compose up -d
+    - echo "Running tests..."
+    - chmod +x run_test.sh # Ensure the script is executable
+    - ./run_test.sh # Run the test script
   tags:
     - ansible
-#work at this moment 17.02.2025 at 4:35
