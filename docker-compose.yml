@@ -51,3 +51,13 @@ services:
       - service1_instance2
       - service1_instance3
       - service2
+
+  tests:
+    build:
+      context: ./tests
+      dockerfile: Dockerfile
+    depends_on:
+      - service2 # Ensure service2 is up before running tests
+    environment:
+      - NODE_ENV=test
+    command: ["npm", "test"] # Run the tests with the npm test command

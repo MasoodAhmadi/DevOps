@@ -1,19 +1,17 @@
-FROM node:16-alpine
+# Dockerfile for running tests
+FROM node:18
 
-# Set the working directory
+# Set working directory
 WORKDIR /app
 
-# Copy the package.json and package-lock.json (if available)
-COPY tests/package.json ./
+# Copy package.json and package-lock.json
+COPY package.json package-lock.json ./
 
 # Install dependencies
 RUN npm install
 
-# Copy the rest of the application files
+# Copy the test files
 COPY . .
 
-# Expose port 3000 if needed for other processes
-EXPOSE 3000
-
-# Run the tests with npm test instead of starting the server
+# Run tests (you can also specify `npm test` directly in the docker-compose.yml as `command`)
 CMD ["npm", "test"]
