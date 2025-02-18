@@ -27,13 +27,18 @@ build:
 
 test:
   stage: test
-  image: node:18
+  image: node:21.6.2 # Match Node.js version used in local dev
   script:
     - echo "Checking files in the working directory..."
     - ls -al tests # Check if test_service2.sh exists inside 'tests/'
-    - chmod +x tests/test_service2.sh
-    - npm install # Install dependencies for service2
-    - tests/test_service2.sh # Run the test script
+    - chmod +x tests/test_service2.sh # Make sure it's executable
+    - npm install # Install dependencies for service2 (including jest)
+    - echo "Starting Service2..."
+    - docker-compose -f docker-compose.yml up -d service2 # Start Service2 in the background using Docker Compose
+    - sleep 5 # Wait for Service2 to be ready
+    - echo "Running tests..."
+    - npm test # Run the tests directly instead of using the shell script
+    - docker-compose -f docker-compose.yml down # Stop the containers after testing
   tags:
     - ansible
 
