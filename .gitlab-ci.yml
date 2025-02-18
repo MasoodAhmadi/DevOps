@@ -27,12 +27,12 @@ build:
 
 test:
   stage: test
-  image: node:18 # Use a Node.js image to run service2
+  image: node:18
   script:
     - echo "Checking files in the working directory..."
-    - ls -al # Debugging step
-    - chmod +x test_service2.sh # Ensure script is executable
-    - npm install # Install dependencies for Service2
+    - ls -al tests # Check if test_service2.sh exists inside 'tests/'
+    - chmod +x tests/test_service2.sh
+    - npm install # Install dependencies for service2
     - tests/test_service2.sh # Run the test script
   tags:
     - ansible
