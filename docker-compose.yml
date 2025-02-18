@@ -9,6 +9,8 @@ services:
       - "5000"
     environment:
       - NODE_ENV=development
+    networks:
+      - dev_network
 
   service1_instance2:
     build:
@@ -18,6 +20,8 @@ services:
       - "5000"
     environment:
       - NODE_ENV=development
+    networks:
+      - dev_network
 
   service1_instance3:
     build:
@@ -27,6 +31,8 @@ services:
       - "5000"
     environment:
       - NODE_ENV=development
+    networks:
+      - dev_network
 
   service2:
     build:
@@ -37,7 +43,7 @@ services:
     environment:
       - NODE_ENV=development
     networks:
-      - dev_network
+      - dev_network # Ensure service2 is on the same network
 
   nginx:
     build:
@@ -54,7 +60,7 @@ services:
       - service1_instance3
       - service2
     networks:
-      - dev_network
+      - dev_network # Ensure nginx is on the same network
 
   tests:
     build:
@@ -66,8 +72,8 @@ services:
       - NODE_ENV=test
     command: ["npm", "test"]
     networks:
-      - dev_network # Ensure the tests service is on the same network as service2
+      - dev_network # Ensure the tests service is on the same network
 
 networks:
   dev_network:
-    driver: bridge
+    driver: bridge # Ensure the network is created and used
