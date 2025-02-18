@@ -30,17 +30,18 @@ test:
   image: node:21.6.2 # Match Node.js version used in local dev
   script:
     - echo "Checking files in the working directory..."
-    - docker ps
+    # - docker ps
+    - cd service2 # Change to the service2 directory
     - ls -al # List files to ensure we are in the right directory
-    - cd tests # Change to the service2 directory
     - ls -al # Check that package.json is in the service2 directory
     - npm install # Install dependencies for service2
-    # - echo "Starting Service2..."
-    # - docker-compose -f docker-compose.yml up -d service2 # Start Service2 in the background using Docker Compose
-    # - sleep 5 # Wait for Service2 to be ready
+    - echo "Starting Service2..."
+    - docker-compose -f docker-compose.yml up -d service2 # Start Service2 in the background using Docker Compose
+    - sleep 5 # Wait for Service2 to be ready
     - echo "Running tests..."
+    - cd tests # Change to the service2 directory
     - npm test # Run the tests directly
-    # - docker-compose -f docker-compose.yml down # Stop the containers after testing
+    - docker-compose -f docker-compose.yml down # Stop the containers after testing
   tags:
     - ansible
 
