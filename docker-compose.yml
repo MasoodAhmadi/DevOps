@@ -46,6 +46,9 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/.htpasswd:/etc/nginx/.htpasswd:ro
+
+    command: /bin/sh -c "cp /etc/nginx/custom.conf /etc/nginx/nginx.conf && exec nginx -g 'daemon off;'"
+
     depends_on:
       - service1_instance1
       - service1_instance2
