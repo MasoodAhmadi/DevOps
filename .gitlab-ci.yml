@@ -15,9 +15,7 @@ variables:
 services:
   - name: docker:20.10.21-dind
     alias: docker-dind # Unique alias for Docker-in-Docker
-    command: ["--tls=false", "--host", "tcp://0.0.0.0:2375"] # Disable TLS and bind to port
-# Validate docker-compose.yml
-
+    command: ["--tls=false", "--host", "tcp://0.0.0.0:2375"]
 build:
   stage: build
   script:
@@ -29,15 +27,18 @@ build:
 test:
   stage: test
   script:
-    - echo "Starting the test environment..."
-    - docker ps
-    - docker images
-    - docker ps -a
-    - docker-compose up --scale tests=0 -d
     - echo "Running tests..."
-    - docker-compose -f docker-compose.yml run tests npm test
-    - echo "Stopping the test environment..."
-    - docker-compose -f docker-compose.yml down
+    - docker-compose -f docker-compose.yml up -d nginx # Specify the file directly if $COMPOSE_FILE is not defined
+    - |
+      echo "Waiting for Nginx to be ready..."
+      until curl --silent --fail http://nginx:8198/fetch; do
+        echo "Waiting for Nginx to respond on http://nginx:8198/fetch...";
+        sleep 5;
+      done
+      echo "Nginx is ready!"
+    - docker-compose -f docker-compose.yml run tests # Run the tests service
+    - docker-compose -f docker-compose.yml logs nginx # Print nginx logs for debugging
+
   tags:
     - ansible
 # deploy:
