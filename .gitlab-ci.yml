@@ -29,17 +29,16 @@ test:
   stage: test
   script:
     - echo "Running tests..."
-    - docker-compose -f $COMPOSE_FILE up -d nginx # Ensure nginx is up before tests
-    - echo "Waiting for Nginx to be ready..."
-    # Retry until Nginx is responding, for up to 1 minute (or adjust the time as needed)
+    - docker-compose -f docker-compose.yml up -d nginx # Specify the file directly if $COMPOSE_FILE is not defined
     - |
+      echo "Waiting for Nginx to be ready..."
       until curl --silent --fail http://nginx:8198/fetch; do
-        echo "Waiting for nginx to be ready...";
+        echo "Waiting for Nginx to respond on http://nginx:8198/fetch...";
         sleep 5;
       done
-    - echo "Nginx is ready, running tests..."
-    - docker-compose -f $COMPOSE_FILE run tests # Run the tests service
-    - docker-compose -f $COMPOSE_FILE logs nginx # Print nginx logs for debugging
+      echo "Nginx is ready!"
+    - docker-compose -f docker-compose.yml run tests # Run the tests service
+    - docker-compose -f docker-compose.yml logs nginx # Print nginx logs for debugging
 
   tags:
     - ansible
