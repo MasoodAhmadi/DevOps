@@ -60,7 +60,7 @@ services:
       - service1_instance3
       - service2
     networks:
-      - dev_network # Ensure nginx is on the same network
+      - dev_network
 
   tests:
     build:
@@ -79,4 +79,4 @@ services:
 
 networks:
   dev_network:
-    driver: bridge # Ensure the network is created and used
+    driver: bridge

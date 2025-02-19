@@ -26,19 +26,18 @@ build:
 
 test:
   stage: test
+  image: docker:20.10.21
   script:
-    - echo "Running tests..."
-    - docker-compose -f docker-compose.yml up -d nginx # Specify the file directly if $COMPOSE_FILE is not defined
-    - |
-      echo "Waiting for Nginx to be ready..."
-      until curl --silent --fail http://nginx:8198/fetch; do
-        echo "Waiting for Nginx to respond on http://nginx:8198/fetch...";
-        sleep 5;
-      done
-      echo "Nginx is ready!"
-    - docker-compose -f docker-compose.yml run tests # Run the tests service
-    - docker-compose -f docker-compose.yml logs nginx # Print nginx logs for debugging
-
+    - echo "Start the test environment"
+    - docker-compose up --scale tests=1 -d
+    - echo "Wait for services to be read"
+    - sleep 5
+    - docker-compose ps
+    - echo "Running unit tests"
+    - docker-compose run --rm tests
+    - echo "Wait for services to be read"
+    - sleep 5
+    - docker-compose down
   tags:
     - ansible
 # deploy:
