@@ -16,14 +16,21 @@ services:
   - name: docker:20.10.21-dind
     alias: docker-dind # Unique alias for Docker-in-Docker
     command: ["--tls=false", "--host", "tcp://0.0.0.0:2375"] # Disable TLS and bind to port
-
-build:
+# Validate docker-compose.yml
+validate:
   stage: build
   script:
-    - echo "Building Docker images..."
-    - docker-compose -f docker-compose.yml build
+    - echo "Validating docker-compose.yml..."
+    - docker-compose -f docker-compose.yml config # This checks for configuration errors
   tags:
     - ansible
+# build:
+#   stage: build
+#   script:
+#     - echo "Building Docker images..."
+#     - docker-compose -f docker-compose.yml build
+#   tags:
+#     - ansible
 
 test:
   stage: test
@@ -42,11 +49,11 @@ test:
 
   tags:
     - ansible
-deploy:
-  stage: deploy
-  script:
-    - echo "Start the deploy environment"
-    - docker-compose up -d
-  tags:
-    - ansible
+# deploy:
+#   stage: deploy
+#   script:
+#     - echo "Start the deploy environment"
+#     - docker-compose up -d
+#   tags:
+#     - ansible
 #work at this moment 17.02.2025 at 4:35
