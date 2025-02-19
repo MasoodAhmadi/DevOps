@@ -31,7 +31,7 @@ test:
   image: docker:20.10.21
   script:
     - echo "Start the test environment"
-    - docker-compose up --scale tests=0 -d
+    - docker-compose up build -d
     - echo "Wait for services to be read"
     - sleep 5
     - docker-compose ps
