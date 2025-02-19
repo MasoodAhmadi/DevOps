@@ -25,17 +25,20 @@ build:
   tags:
     - ansible
 
-  tests:
-    build:
-      context: ./tests
-      dockerfile: Dockerfile
-    depends_on:
-      - nginx # Ensure nginx starts before tests
-    environment:
-      - NODE_ENV=test
-    command: ["npm", "test"]
-    networks:
-      - dev_network # Ensure tests and nginx are on the same network
+test:
+  stage: test
+  script:
+    - echo "Waiting for Nginx to be fully ready..."
+    - docker-compose -f $COMPOSE_FILE up -d nginx # Ensure nginx starts
+    - >
+      until curl --silent --fail http://nginx:8198/fetch; do
+        echo "Waiting for nginx to be ready...";
+        sleep 5;
+      done
+    - echo "Nginx is ready, running tests..."
+    - docker-compose -f $COMPOSE_FILE run tests # Run the tests service
+  after_script:
+    - docker-compose -f $COMPOSE_FILE down # Clean up the containers after the test
 
 deploy:
   stage: deploy
