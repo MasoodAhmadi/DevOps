@@ -1,12 +1,17 @@
-FROM node:16-alpine
+# Use Node.js as base image (adjust the version if needed)
+FROM node:18
 
-WORKDIR /app
+# Set the working directory inside the container
+WORKDIR /tests
 
-COPY package.json ./
+# Copy package.json and package-lock.json to install dependencies
+COPY package.json package-lock.json ./
+
+# Install dependencies
 RUN npm install
 
+# Copy the test files into the container
 COPY . .
 
-EXPOSE 3000
-
-CMD ["npm", "start"]
+# Command to run tests
+CMD ["npm", "test"]

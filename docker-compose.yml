@@ -62,16 +62,20 @@ services:
     networks:
       - dev_network # Ensure nginx is on the same network
 
-  tests:
-    build: ./tests
-    container_name: tests
-    depends_on:
-      - nginx
-    volumes:
-      - ./tests:/tests
-    working_dir: /tests
-    networks:
-      - dev_network
+tests:
+  build:
+    context: ./tests
+    dockerfile: Dockerfile
+  depends_on:
+    - nginx
+  environment:
+    - NODE_ENV=test
+  volumes:
+    - ./tests:/tests
+  working_dir: /tests
+  command: ["npm", "test"]
+  networks:
+    - dev_network
 
 networks:
   dev_network:
