@@ -1,5 +1,5 @@
 const request = require('supertest');
-const url = 'http://nginx:80';  // Ensure this points to service2, not localhost
+const url = 'http://localhost:8198/';  // Ensure this points to service2, not localhost
 
 describe('Service2 API Tests', () => {
     test('GET /api/system-info should return 200 and valid JSON', async () => {
