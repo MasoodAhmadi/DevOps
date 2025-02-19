@@ -67,10 +67,8 @@ services:
     container_name: tests
     depends_on:
       - nginx
-    # command: ["npm", "test"]
     volumes:
       - ./tests:/tests
-
     working_dir: /tests
     networks:
       - dev_network

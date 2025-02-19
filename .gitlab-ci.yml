@@ -28,12 +28,12 @@ build:
 
 test:
   stage: test
-  image: docker/compose:1.29.2
-  services:
-    - docker:dind
   script:
     - echo "Starting the test environment..."
-    - docker-compose -f docker-compose.yml up -d
+    - docker ps
+    - docker images
+    - docker ps -a
+    - docker-compose up --scale tests=0 -d
     - echo "Running tests..."
     - docker-compose -f docker-compose.yml run tests npm test
     - echo "Stopping the test environment..."
