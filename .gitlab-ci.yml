@@ -25,15 +25,17 @@ build:
   tags:
     - ansible
 
-test:
-  stage: test
-  image: node:21.6.2 # Match Node.js version used in local dev
-  script:
-    - echo "Running tests..."
-    - cd tests && npm install
-    - npm test
-  tags:
-    - ansible
+  tests:
+    build:
+      context: ./tests
+      dockerfile: Dockerfile
+    depends_on:
+      - nginx # Ensure nginx starts before tests
+    environment:
+      - NODE_ENV=test
+    command: ["npm", "test"]
+    networks:
+      - dev_network # Ensure tests and nginx are on the same network
 
 deploy:
   stage: deploy
