@@ -28,8 +28,8 @@ test:
   stage: test
   script:
     - echo "Checking nginx.conf"
-    - ls -l ./nginx/
-    - file ./nginx/nginx.conf
+    - ls -l ./nginx/nginx.conf
+    - cat ./nginx/nginx.conf
     - echo "Checking inside container (if running)"
     - docker ps
     - docker-compose up --scale tests=1 -d
