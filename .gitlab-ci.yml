@@ -22,7 +22,6 @@ build:
   stage: build
   script:
     - echo "Building Docker images..."
-    - ls -l ./nginx/nginx.conf
     - docker-compose -f docker-compose.yml build
   tags:
     - ansible
