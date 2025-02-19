@@ -29,10 +29,11 @@ test:
   image: docker:20.10.21
   script:
     - echo "Start the test environment"
+    - echo "Checking nginx.conf"
+    - ls -l ./nginx/
+    - cat ./nginx/nginx.conf
+    - echo "Starting test environment..."
     - docker-compose up --scale tests=1 -d
-    - echo "Wait for services to be read"
-    - sleep 5
-    - docker-compose ps
     - echo "Running unit tests"
     - docker-compose run --rm tests
     - echo "Wait for services to be read"
