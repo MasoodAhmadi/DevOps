@@ -52,8 +52,8 @@ services:
     ports:
       - "8198:80"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/.htpasswd:/etc/nginx/.htpasswd:ro
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/.htpasswd:/etc/nginx/.htpasswd
     depends_on:
       - service1_instance1
       - service1_instance2
@@ -62,19 +62,18 @@ services:
     networks:
       - dev_network # Ensure nginx is on the same network
 
-  test:
-  build:
-    context: ./tests
-    dockerfile: Dockerfile
-  depends_on:
-    - nginx
-  environment:
-    - NODE_ENV=test
-  command: ["npm", "test"]
-  entrypoint: |
-    bash -c "while ! curl -s http://nginx:8198; do echo 'Waiting for Nginx'; sleep 5; done; npm test"
-  networks:
-    - dev_network
+  tests:
+    build: ./tests
+    container_name: tests
+    depends_on:
+      - nginx
+    # command: ["npm", "test"]
+    volumes:
+      - ./tests:/tests
+
+    working_dir: /tests
+    networks:
+      - dev_network
 
 networks:
   dev_network:
