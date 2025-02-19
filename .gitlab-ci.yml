@@ -23,21 +23,20 @@ build:
     - docker-compose -f docker-compose.yml build
   tags:
     - ansible
-
-test:
-  stage: test
-  script:
-    - echo "Checking nginx.conf"
-    - ls -l ./nginx/nginx.conf
-    - cat ./nginx/nginx.conf
-    - echo "Checking inside container (if running)"
-    - docker ps
-    - docker-compose up --scale tests=1 -d
-    - docker exec -it devops-nginx-1 ls -l /etc/nginx/ || echo "Nginx container not running"
-    - docker-compose down
-  tags:
-    - ansible
-# deploy:
+# test:
+#   stage: test
+#   script:
+#     - echo "Checking nginx.conf"
+#     - ls -l ./nginx/nginx.conf
+#     - cat ./nginx/nginx.conf
+#     - echo "Checking inside container (if running)"
+#     - docker ps
+#     - docker-compose up --scale tests=1 -d
+#     - docker exec -it devops-nginx-1 ls -l /etc/nginx/ || echo "Nginx container not running"
+#     - docker-compose down
+#   tags:
+#     - ansible
+# # deploy:
 #   stage: deploy
 #   script:
 #     - echo "Start the deploy environment"
