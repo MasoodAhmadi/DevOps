@@ -77,3 +77,9 @@ services:
 networks:
   dev_network:
     driver: bridge # Ensure the network is created and used
+healthcheck:
+  test: ["CMD", "curl", "-f", "http://localhost:80/fetch"]
+  interval: 10s
+  retries: 5
+  start_period: 10s
+  timeout: 5s
