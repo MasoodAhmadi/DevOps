@@ -62,17 +62,19 @@ services:
     networks:
       - dev_network # Ensure nginx is on the same network
 
-  tests:
-    build:
-      context: ./tests
-      dockerfile: Dockerfile
-    depends_on:
-      - nginx # Ensure nginx starts before tests
-    environment:
-      - NODE_ENV=test
-    command: ["npm", "test"]
-    networks:
-      - dev_network # Ensure tests and nginx are on the same network
+  test:
+  build:
+    context: ./tests
+    dockerfile: Dockerfile
+  depends_on:
+    - nginx
+  environment:
+    - NODE_ENV=test
+  command: ["npm", "test"]
+  entrypoint: |
+    bash -c "while ! curl -s http://nginx:8198; do echo 'Waiting for Nginx'; sleep 5; done; npm test"
+  networks:
+    - dev_network
 
 networks:
   dev_network:
