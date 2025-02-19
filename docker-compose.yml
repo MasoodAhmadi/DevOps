@@ -9,8 +9,6 @@ services:
       - "5000"
     environment:
       - NODE_ENV=development
-    networks:
-      - dev_network
 
   service1_instance2:
     build:
@@ -20,8 +18,6 @@ services:
       - "5000"
     environment:
       - NODE_ENV=development
-    networks:
-      - dev_network
 
   service1_instance3:
     build:
@@ -42,8 +38,6 @@ services:
       - "3000"
     environment:
       - NODE_ENV=development
-    networks:
-      - dev_network # Ensure service2 is on the same network
 
   nginx:
     build:
@@ -52,15 +46,13 @@ services:
     ports:
       - "8198:80"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./nginx/.htpasswd:/etc/nginx/.htpasswd
     depends_on:
       - service1_instance1
       - service1_instance2
       - service1_instance3
       - service2
-    networks:
-      - dev_network
 
   tests:
     build:
@@ -74,9 +66,3 @@ services:
       - ./tests:/tests
     working_dir: /tests
     command: ["npm", "test"]
-    networks:
-      - dev_network
-
-networks:
-  dev_network:
-    driver: bridge
