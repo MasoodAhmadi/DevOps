@@ -32,7 +32,8 @@ test:
     - docker-compose -f $COMPOSE_FILE up -d nginx # Ensure nginx is up before tests
     - docker-compose -f $COMPOSE_FILE logs nginx # Print nginx logs for debugging
     - docker-compose -f $COMPOSE_FILE run tests # Run the tests service
-
+  tags:
+    - ansible
 deploy:
   stage: deploy
   script:
