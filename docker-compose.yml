@@ -45,7 +45,7 @@ services:
       - "8198:80"
     volumes:
       - ./nginx:/etc/nginx
-      - ./nginx/.htpasswd:/etc/nginx/.htpasswd:ro
+      - ./nginx/.htpasswd:/etc/nginx/.htpasswd
 
     depends_on:
       - service1_instance1
