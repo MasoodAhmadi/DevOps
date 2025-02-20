@@ -44,11 +44,8 @@ services:
     ports:
       - "8198:80"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx:/etc/nginx
       - ./nginx/.htpasswd:/etc/nginx/.htpasswd:ro
-      - ./nginx/custom.conf:/etc/nginx/custom.conf:ro
-
-    command: /bin/sh -c "cp /etc/nginx/custom.conf /etc/nginx/nginx.conf && exec nginx -g 'daemon off;'"
 
     depends_on:
       - service1_instance1
