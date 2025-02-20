@@ -1,16 +1,12 @@
-FROM node:16-alpine
+FROM node:18
+
+# Install Docker CLI
+RUN apt-get update && apt-get install -y docker.io
+RUN apt-get update && apt-get install -y docker-compose
 
 WORKDIR /app
-
-# Copy package.json (and package-lock.json if available)
-COPY package.json ./
-# Optionally: COPY package-lock.json ./
-
+COPY package*.json ./
 RUN npm install
-
-# Copy the rest of your source code, including app.js
 COPY . .
-
-EXPOSE 5000
 
 CMD ["npm", "start"]

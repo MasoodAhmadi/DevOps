@@ -1,5 +1,6 @@
 const express = require('express');
 const axios = require('axios');
+const { exec } = require('child_process'); // Import child_process to run shell commands
 const app = express();
 
 app.get('/', (req, res) => {
@@ -22,7 +23,6 @@ app.get('/', (req, res) => {
       <textarea id="resultArea" placeholder="Result will be displayed here"></textarea>
 
       <script>
-        // When the REQUEST button is clicked, call the /fetch endpoint.
         document.getElementById('requestBtn').addEventListener('click', function() {
           fetch('/fetch')
             .then(response => response.json())
@@ -33,8 +33,7 @@ app.get('/', (req, res) => {
               document.getElementById('resultArea').value = 'Error: ' + err;
             });
         });
-        
-        // When the STOP button is clicked, call the /stop endpoint.
+
         document.getElementById('stopBtn').addEventListener('click', function() {
           fetch('/stop')
             .then(response => response.text())
@@ -57,18 +56,22 @@ app.get('/fetch', async (req, res) => {
     res.json(response.data);
 
     const start = Date.now();
-    while (Date.now() - start < 2000) {
-    }
+    while (Date.now() - start < 2000) { }
   } catch (error) {
     res.status(500).json({ error: error.toString() });
   }
 });
 
 app.get('/stop', (req, res) => {
-  res.send('Stopping Service1');
-  setTimeout(() => {
-    process.exit(0);
-  }, 1000);
+  res.send('Stopping all services...');
+
+  exec('docker stop $(docker ps -q)', (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Error stopping services: ${error.message}`);
+      return;
+    }
+    console.log(`Services stopped: ${stdout}`);
+  });
 });
 
 app.listen(5000, () => {

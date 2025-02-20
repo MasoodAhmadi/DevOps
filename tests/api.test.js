@@ -40,7 +40,7 @@ app.post('/stop', (req, res) => {
 
     isRunning = false;
     server.close(() => {
-        console.log('Mock Nginx stopped');
+        console.log('Nginx stopped');
     });
 
     res.status(200).json({ message: 'Nginx stopped successfully' });
