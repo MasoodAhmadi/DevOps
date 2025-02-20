@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@babel/preset-env": "^7.12.3",
+    "axios": "^1.7.9",
     "check-disk-space": "^2.1.0",
     "diskusage-ng": "^1.0.4",
     "dotenv": "^8.2.0",
