@@ -72,7 +72,7 @@ services:
       - API_URL=http://nginx/fetch
     volumes:
       - ./tests:/app
-      - ./test-logs:/app/test-logs # Persist test results in a local directory
+      - ./test-logs:/app/test-logs
     networks:
       - devops_network
 networks:

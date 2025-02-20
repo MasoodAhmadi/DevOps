@@ -1,12 +1,11 @@
 const express = require('express');
-const disk = require('diskusage-ng'); // Ensure this is installed
+const disk = require('diskusage-ng');
 const os = require('os');
 
 const app = express();
 
 app.get('/api/system-info', async (req, res) => {
     try {
-        // Get disk space info
         const diskInfo = await new Promise((resolve, reject) => {
             disk("/", (err, info) => {
                 if (err) reject(err);
@@ -14,7 +13,6 @@ app.get('/api/system-info', async (req, res) => {
             });
         });
 
-        // System info object
         const systemInfo = {
             service: 'Service2',
             ip: getIPAddress(),
@@ -26,7 +24,7 @@ app.get('/api/system-info', async (req, res) => {
             }
         };
 
-        console.log("System Info:", systemInfo); // Debugging log
+        console.log("System Info:", systemInfo);
         res.json(systemInfo);
     } catch (error) {
         console.error("Error fetching system info:", error);
@@ -34,7 +32,6 @@ app.get('/api/system-info', async (req, res) => {
     }
 });
 
-// Helper function to get the IP address
 function getIPAddress() {
     const interfaces = os.networkInterfaces();
     for (const interfaceName in interfaces) {
@@ -47,7 +44,6 @@ function getIPAddress() {
     return '127.0.0.1';
 }
 
-// Start server
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`Service2 running on port ${port}`);

@@ -31,35 +31,15 @@ test:
   services:
     - docker:dind
   script:
-    # Ensure Docker Compose is installed
     - docker-compose --version
-    - docker-compose ps # Check that services are running
+    - docker-compose ps
     - docker-compose -f docker-compose.yml up --scale test-service=0 -d # Start services in the background
-    - docker-compose ps # Check that services are running
-    - docker-compose run -T test-service # Run tests in the test service
-    - docker-compose down # Stop and remove the containers
+    - docker-compose ps
+    - docker-compose run -T test-service
+    - docker-compose down
   only:
     - project
   tags:
     - ansible
-# test:
-#   stage: test
-#   script:
-#     - echo "Checking nginx.conf"
-#     - ls -l ./nginx/nginx.conf
-#     - cat ./nginx/nginx.conf
-#     - echo "Checking inside container (if running)"
-#     - docker ps
-#     - docker-compose up --scale tests=1 -d
-#     - docker exec -it devops-nginx-1 ls -l /etc/nginx/ || echo "Nginx container not running"
-#     - docker-compose down
-#   tags:
-#     - ansible
-# # deploy:
-#   stage: deploy
-#   script:
-#     - echo "Start the deploy environment"
-#     - docker-compose up -d
-#   tags:
-#     - ansible
 #work at this moment 17.02.2025 at 4:35
+#test works at this moment 20.02.2025 at 12:56

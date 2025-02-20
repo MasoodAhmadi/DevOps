@@ -3,10 +3,9 @@
 <h3 align="left">How to run:</h3>
 
 ```
-- git clone -b exercise1 https://github.com/MasoodAhmadi/DevOps
-- docker-compose up –-build 
+- git clone -b project https://github.com/MasoodAhmadi/DevOps
+- docker-compose up –-build
   … wait for 10s
-- curl localhost:8199
-- cdocker-compose downW
+- curl localhost:8198
+- docker-compose down
 ```
-

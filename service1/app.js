@@ -2,7 +2,6 @@ const express = require('express');
 const axios = require('axios');
 const app = express();
 
-// Serve the UI with two buttons (REQUEST and STOP) and a text area
 app.get('/', (req, res) => {
   res.send(`
     <!DOCTYPE html>
@@ -52,33 +51,26 @@ app.get('/', (req, res) => {
   `);
 });
 
-// Endpoint to fetch API data from Service2 and then block for 2 seconds.
 app.get('/fetch', async (req, res) => {
   try {
-    // Fetch data from Service2's API
     const response = await axios.get('http://service2:3000/api/system-info');
     res.json(response.data);
 
-    // Simulate a blocking 2-second delay after responding
     const start = Date.now();
     while (Date.now() - start < 2000) {
-      // Busy wait (not recommended for production)
     }
   } catch (error) {
     res.status(500).json({ error: error.toString() });
   }
 });
 
-// Endpoint to simulate system shutdown (e.g., stopping containers)
 app.get('/stop', (req, res) => {
   res.send('Stopping Service1');
-  // After a short delay, exit the process to simulate a shutdown.
   setTimeout(() => {
     process.exit(0);
   }, 1000);
 });
 
-// Start Service1 on port 5000
 app.listen(5000, () => {
   console.log('Service1 listening on port 5000');
 });
