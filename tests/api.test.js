@@ -1,6 +1,6 @@
 // const request = require('supertest');
 const axios = require('axios');
-const API_URL = process.env.API_URL || "http://nginx:8198/fetch";
+const API_URL = "http://localhost:8198/fetch";
 
 describe('Service2 API Tests', () => {
     test('GET /api/system-info should return 200 and valid JSON', async () => {
