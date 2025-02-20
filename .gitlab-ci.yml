@@ -34,6 +34,7 @@ test:
     - docker-compose --version
     - docker-compose ps # Check that services are running
     - docker-compose -f docker-compose.yml up -d # Start services in the background
+    - docker-compose ps # Check that services are running
     - docker-compose run -T test-service # Run tests in the test service
     - docker-compose down # Stop and remove the containers
   only:
