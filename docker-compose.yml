@@ -59,7 +59,7 @@ services:
     depends_on:
       - nginx
     environment:
-      - API_URL=http://nginx/fetch
+      - API_URL=http://localhost:8198/fetch
     volumes:
       - ./tests:/app
       - ./test-logs:/app/test-logs # Persist test results in a local directory
