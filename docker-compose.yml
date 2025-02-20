@@ -57,8 +57,7 @@ services:
       context: ./tests
       dockerfile: Dockerfile
     depends_on:
-      nginx:
-        condition: service_healthy
+      - nginx
     environment:
       - API_URL=http://nginx/fetch
     volumes:
