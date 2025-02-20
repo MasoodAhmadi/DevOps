@@ -33,7 +33,7 @@ test:
     # Ensure Docker Compose is installed
     - docker-compose --version
     - docker-compose ps # Check that services are running
-    - docker-compose -f docker-compose.yml up -d # Start services in the background
+    - docker-compose -f docker-compose.yml up # Start services in the background
     - docker-compose exec -T test-service npm test # Run tests in the test service
     - docker-compose down # Stop and remove the containers
   only:
