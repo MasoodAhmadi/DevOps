@@ -5,18 +5,17 @@ const { exec } = require("child_process");
 
 const app = express();
 const PORT = 8197;
-let systemState = "INIT"; // Default state
+let systemState = "INIT";
 const logFile = "run-log.txt";
 
-app.use(bodyParser.text()); // Accept text/plain body
+app.use(bodyParser.text());
 
-// Log state changes
 const logStateChange = (prevState, newState) => {
     const logEntry = `${new Date().toISOString()}: ${prevState} -> ${newState}\n`;
     fs.appendFileSync(logFile, logEntry);
 };
 
-// PUT /state - Change system state
+
 app.put("/state", (req, res) => {
     const newState = req.body.trim().toUpperCase();
 
@@ -42,7 +41,6 @@ app.put("/state", (req, res) => {
     }
 });
 
-// GET /request - Simulate request handling
 app.get("/request", (req, res) => {
     if (systemState === "PAUSED") {
         return res.status(503).send("System is paused, request cannot be processed.");
@@ -50,7 +48,6 @@ app.get("/request", (req, res) => {
     res.send("Request processed successfully!");
 });
 
-// GET /run-log - Get state change log
 app.get("/run-log", (req, res) => {
     if (fs.existsSync(logFile)) {
         res.type("text/plain").send(fs.readFileSync(logFile, "utf8"));
@@ -59,5 +56,4 @@ app.get("/run-log", (req, res) => {
     }
 });
 
-// Start API Gateway
 app.listen(PORT, () => console.log(`API Gateway running on port ${PORT}`));
