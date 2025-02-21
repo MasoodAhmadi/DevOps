@@ -19,7 +19,7 @@ services:
     expose:
       - "5000"
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock" # 🚀 Allow container to execute Docker commands on the host
+      - "/var/run/docker.sock:/var/run/docker.sock"
     environment:
       - NODE_ENV=development
     networks:
@@ -46,7 +46,21 @@ services:
       - NODE_ENV=development
     networks:
       - devops_network
-
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8197:8197"
+    environment:
+      - NODE_ENV=development
+    networks:
+      - devops_network
+    depends_on:
+      - service1_instance1
+      - service1_instance2
+      - service1_instance3
+      - service2
   nginx:
     build:
       context: ./nginx
@@ -62,6 +76,7 @@ services:
       - service1_instance2
       - service1_instance3
       - service2
+      - gateway
     networks:
       - devops_network
   test-service:
