@@ -1,0 +1,31 @@
+{
+  "name": "devops",
+  "version": "1.0.0",
+  "description": "Masood Ahmadi devops test",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "jest"
+  },
+  "author": {
+    "name": "Masood Ahmadi",
+    "email": "masood.ahmadi@tuni.fi"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": "21.6.2"
+  },
+  "dependencies": {
+    "@babel/preset-env": "^7.12.3",
+    "axios": "^1.7.9",
+    "check-disk-space": "^2.1.0",
+    "diskusage-ng": "^1.0.4",
+    "dotenv": "^8.2.0",
+    "express": "^4.21.2",
+    "ts-jest": "29.2.5"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0"
+  }
+}
